@@ -1,7 +1,7 @@
 import {StrKey, Asset, LiquidityPoolAsset} from 'stellar-sdk'
 import {shortenString} from '@stellar-expert/formatter'
 import {generateLiquidityPoolId} from './liquidity-pool-id'
-import {isValidAssetCode} from './validation'
+import {isValidAssetCode, isValidPoolId} from './validation'
 
 function normalizeType(code, type) {
     switch (type) {
