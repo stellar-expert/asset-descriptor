@@ -1,23 +1,10 @@
-import {AssetDescriptor} from './asset-descriptor'
-
-export function isValidAssetCode(code) {
-    return /^[a-zA-Z0-9]{1,12}$/.test(code)
-}
-
 /**
- * Check whether an asset descriptor or string representation is valid
- * @param {String|AssetDescriptor} asset - Asset to check
+ * Asset code validation
+ * @param {String} code
  * @return {Boolean}
  */
-export function isAssetValid(asset) {
-    if (asset instanceof AssetDescriptor) return true
-    if (isValidPoolId(asset)) return true
-    try {
-        new AssetDescriptor(asset)
-        return true
-    } catch (e) {
-        return false
-    }
+export function isValidAssetCode(code) {
+    return typeof code === 'string' && /^[a-zA-Z0-9]{1,12}$/.test(code)
 }
 
 /**
@@ -26,7 +13,18 @@ export function isAssetValid(asset) {
  * @return {Boolean}
  */
 export function isValidPoolId(poolId) {
-    if (typeof poolId === 'string') return /^\w{64}$/.test(poolId)
-    if (poolId instanceof Uint8Array) return poolId.length === 32
+    if (typeof poolId === 'string')
+        return /^\w{64}$/.test(poolId)
+    if (poolId instanceof Uint8Array)
+        return poolId.length === 32
     return false
+}
+
+/**
+ * Lazy contract address format check
+ * @param {String} address
+ * @return {Boolean}
+ */
+export function isValidContract(address) {
+    return typeof address === 'string' && address.length === 56 && address[0] === 'C'
 }

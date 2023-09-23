@@ -1,20 +1,6 @@
 import {StrKey, Asset, LiquidityPoolAsset} from 'stellar-sdk'
-import {shortenString} from '@stellar-expert/formatter'
 import {generateLiquidityPoolId} from './liquidity-pool-id'
-import {isValidAssetCode, isValidPoolId} from './validation'
-
-function normalizeType(code, type) {
-    switch (type) {
-        case 'credit_alphanum4':
-            return 1
-        case 'credit_alphanum12':
-            return 2
-        default: //autodetect type
-            return code.length > 4 ? 2 : 1
-    }
-}
-
-const nativeAssetCode = 'XLM'
+import {isValidAssetCode, isValidContract, isValidPoolId} from './validation'
 
 /**
  * Stellar Asset definition.
@@ -22,12 +8,13 @@ const nativeAssetCode = 'XLM'
 export class AssetDescriptor {
     /**
      * Creates an instance of the Asset
-     * @param code {String|Asset|AssetDescriptor|{code:String,issuer:String}} - Asset code or fully qualified asset name in CODE-ISSUER-TYPE format.
-     * @param issuer [String] - Asset issuer account public key.
-     * @param type [String] - Asset type. One of ['credit_alphanum4', 'credit_alphanum12', 'native'].
+     * @param {String|Asset|AssetDescriptor|{code:String,issuer:String}} code - Asset code or fully qualified asset name in CODE-ISSUER-TYPE format.
+     * @param {String} [issuer] - Asset issuer account public key.
+     * @param {String} [type] - Asset type. One of ['credit_alphanum4', 'credit_alphanum12', 'native'].
      */
     constructor(code, issuer, type) {
-        if (this instanceof LiquidityPoolDescriptor) return
+        if (this instanceof LiquidityPoolDescriptor || this instanceof ContractAssetDescriptor)
+            return
         if (code instanceof AssetDescriptor) {
             Object.assign(this, code)
         } else if (typeof code === 'object' && !issuer) {
@@ -58,14 +45,29 @@ export class AssetDescriptor {
         Object.freeze(this)
     }
 
+    /**
+     * Asset type
+     * @type {Number}
+     * @readonly
+     */
     type = 0
 
+    /**
+     * Check whether the asset is XLM
+     * @return {boolean}
+     */
     get isNative() {
         return this.type === 0
     }
 
+    /**
+     * Check assets equality
+     * @param {AssetDescriptor} anotherAsset
+     * @return {Boolean}
+     */
     equals(anotherAsset) {
-        if (!anotherAsset) return false
+        if (!anotherAsset)
+            return false
         return this.toString() === anotherAsset.toString()
     }
 
@@ -96,13 +98,17 @@ export class AssetDescriptor {
         if (this.isNative) return 'XLM'
         if (issuerMaxLength) {
             let issuerAllowedLength = issuerMaxLength - 1,
-                shortenedIssuer = shortenString(this.issuer, issuerAllowedLength)
+                shortenedIssuer = trim(this.issuer, issuerAllowedLength)
 
             return `${this.code}-${shortenedIssuer}`
         }
         return this.code
     }
 
+    /**
+     * JSON field converter
+     * @return {String}
+     */
     toJSON() {
         return this.toString()
     }
@@ -111,7 +117,8 @@ export class AssetDescriptor {
      * @return {Asset}
      */
     toAsset() {
-        if (this.isNative) return Asset.native()
+        if (this.isNative)
+            return Asset.native()
         return new Asset(this.code, this.issuer)
     }
 
@@ -123,6 +130,11 @@ export class AssetDescriptor {
         return new AssetDescriptor(nativeAssetCode)
     }
 
+    /**
+     * Parse string or object as AssetDescriptor
+     * @param {String|{}} source
+     * @return {AssetDescriptor}
+     */
     static parse(source) {
         if (source instanceof AssetDescriptor)
             return source
@@ -142,24 +154,134 @@ export class LiquidityPoolDescriptor extends AssetDescriptor {
         this.type = 3
     }
 
+    /**
+     * Poll unique identifier (hash)
+     * @type {String}
+     * @readonly
+     */
     poolId
 
+    /**
+     * Liquidity pool type
+     * @type {Number}
+     * @readonly
+     */
     poolType
 
+    /**
+     * @inheritDoc
+     */
     toString() {
         return this.poolId
     }
 
+    /**
+     * @inheritDoc
+     */
     toFQAN() {
         return this.poolId
     }
 
+    /**
+     * @inheritDoc
+     */
     toCurrency(maxLength) {
-        if (maxLength) return shortenString(this.poolId, maxLength)
+        if (maxLength)
+            return trim(this.poolId, maxLength)
         return this.poolId
     }
 
+    /**
+     * @inheritDoc
+     */
     toAsset() {
         throw new TypeError(`Impossible to convert LiquidityPoolDescriptor to LiquidityPoolAsset`)
     }
+}
+
+export class ContractAssetDescriptor extends AssetDescriptor {
+    constructor(contractAddress) {
+        super()
+        if (!isValidContract(contractAddress))
+            throw new TypeError('Invalid asset contract: ' + contractAddress)
+        this.contract = contractAddress
+        this.type = 4
+    }
+
+    /**
+     * Contract address
+     * @type {String}
+     * @readonly
+     */
+    contract
+
+    get isContract() {
+        return true
+    }
+
+    /**
+     * @inheritDoc
+     */
+    toString() {
+        return this.contract
+    }
+
+    /**
+     * @inheritDoc
+     */
+    toFQAN() {
+        return this.contract
+    }
+
+    /**
+     * @inheritDoc
+     */
+    toCurrency(maxLength) {
+        if (maxLength)
+            return trim(this.contract, maxLength)
+        return this.contract
+    }
+
+    /**
+     * @inheritDoc
+     */
+    toAsset() {
+        throw new TypeError(`Impossible to convert ContractAssetDescriptor to LiquidityPoolAsset`)
+    }
+}
+
+/**
+ * Check whether an asset descriptor or string representation is valid
+ * @param {String|AssetDescriptor} asset - Asset to check
+ * @return {Boolean}
+ */
+export function isAssetValid(asset) {
+    if (asset instanceof AssetDescriptor)
+        return true
+    if (isValidContract(asset) || isValidPoolId(asset))
+        return true
+    try {
+        new AssetDescriptor(asset)
+        return true
+    } catch (e) {
+        return false
+    }
+}
+
+const nativeAssetCode = 'XLM'
+
+function normalizeType(code, type) {
+    switch (type) {
+        case 'credit_alphanum4':
+            return 1
+        case 'credit_alphanum12':
+            return 2
+        default: //autodetect type
+            return code.length > 4 ? 2 : 1
+    }
+}
+
+function trim(value, symbols) {
+    const affixLength = Math.max(2, Math.floor(symbols / 2))
+    return value.substring(0, affixLength) + '…' + value.substring(value.length - affixLength)
 }
