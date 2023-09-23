@@ -1,6 +1,6 @@
 {
   "name": "@stellar-expert/asset-descriptor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Asset wrapper for Stellar standard assets",
   "main": "index.js",
   "repository": {

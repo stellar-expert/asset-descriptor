@@ -10,7 +10,7 @@ export class AssetDescriptor {
      * Creates an instance of the Asset
      * @param {String|Asset|AssetDescriptor|{code:String,issuer:String}} code - Asset code or fully qualified asset name in CODE-ISSUER-TYPE format.
      * @param {String} [issuer] - Asset issuer account public key.
-     * @param {String} [type] - Asset type. One of ['credit_alphanum4', 'credit_alphanum12', 'native'].
+     * @param {String|Number} [type] - Asset type. One of ['credit_alphanum4', 'credit_alphanum12', 'native'].
      */
     constructor(code, issuer, type) {
         if (this instanceof LiquidityPoolDescriptor || this instanceof ContractAssetDescriptor)
@@ -39,8 +39,10 @@ export class AssetDescriptor {
             this.issuer = parts[1]
             this.type = normalizeType(this.code, parts[2])
         }
-        if (this.type !== 0 && !StrKey.isValidEd25519PublicKey(this.issuer)) throw new Error('Invalid asset issuer address: ' + this.issuer)
-        if (!isValidAssetCode(this.code)) throw new Error('Invalid asset code: ' + this.code)
+        if (this.type !== 0 && !StrKey.isValidEd25519PublicKey(this.issuer))
+            throw new Error('Invalid asset issuer address: ' + this.issuer)
+        if (!isValidAssetCode(this.code))
+            throw new Error('Invalid asset code: ' + this.code)
         //if (!this.code || !/^[a-zA-Z0-9]{1,12}$/.test(this.code)) throw new Error(`Invalid asset code. See https://www.stellar.org/developers/guides/concepts/assets.html#alphanumeric-4-character-maximum`)
         Object.freeze(this)
     }
@@ -140,6 +142,8 @@ export class AssetDescriptor {
             return source
         if (isValidPoolId(source))
             return new LiquidityPoolDescriptor(source)
+        if (isValidContract(source))
+            return new ContractAssetDescriptor(source)
         if (source instanceof LiquidityPoolAsset)
             return new LiquidityPoolDescriptor(generateLiquidityPoolId(source))
         return new AssetDescriptor(source)
@@ -152,6 +156,7 @@ export class LiquidityPoolDescriptor extends AssetDescriptor {
         this.poolId = id
         this.poolType = 0
         this.type = 3
+        Object.freeze(this)
     }
 
     /**
@@ -206,6 +211,7 @@ export class ContractAssetDescriptor extends AssetDescriptor {
             throw new TypeError('Invalid asset contract: ' + contractAddress)
         this.contract = contractAddress
         this.type = 4
+        Object.freeze(this)
     }
 
     /**
