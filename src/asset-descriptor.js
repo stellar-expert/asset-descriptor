@@ -138,13 +138,15 @@ export class AssetDescriptor {
      * @return {AssetDescriptor}
      */
     static parse(source) {
+        if (!source)
+            return null
         if (source instanceof AssetDescriptor)
             return source
         if (isValidPoolId(source))
             return new LiquidityPoolDescriptor(source)
         if (isValidContract(source))
             return new ContractAssetDescriptor(source)
-        if (source instanceof LiquidityPoolAsset)
+        if (source.getLiquidityPoolParameters)
             return new LiquidityPoolDescriptor(generateLiquidityPoolId(source))
         return new AssetDescriptor(source)
     }
