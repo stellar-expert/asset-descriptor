@@ -1,4 +1,4 @@
-import {Asset, LiquidityPoolAsset, LiquidityPoolFeeV18, getLiquidityPoolId} from 'stellar-sdk'
+import {Asset, LiquidityPoolAsset, LiquidityPoolFeeV18, getLiquidityPoolId} from 'stellar-base'
 import {AssetDescriptor} from './asset-descriptor'
 
 /**

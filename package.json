@@ -1,6 +1,6 @@
 {
   "name": "@stellar-expert/asset-descriptor",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Asset wrapper for Stellar standard assets",
   "main": "index.js",
   "repository": {
@@ -13,6 +13,6 @@
     "url": "https://github.com/stellar-expert/asset-descriptor/issues"
   },
   "peerDependencies": {
-    "stellar-sdk": ">= 9"
+    "stellar-base": ">= 10"
   }
 }

@@ -1,4 +1,4 @@
-import {StrKey, Asset, LiquidityPoolAsset} from 'stellar-sdk'
+import {StrKey, Asset, LiquidityPoolAsset} from 'stellar-base'
 import {generateLiquidityPoolId} from './liquidity-pool-id'
 import {isValidAssetCode, isValidContract, isValidPoolId} from './validation'
 
