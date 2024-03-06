@@ -253,7 +253,7 @@ export class ContractAssetDescriptor extends AssetDescriptor {
         if (this.code)
             return this.code
         if (maxLength < 56)
-            return trim(this.poolId, maxLength)
+            return trim(this.contract, maxLength)
         return this.contract
     }
 
