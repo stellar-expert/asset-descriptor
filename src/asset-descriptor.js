@@ -78,7 +78,8 @@ export class AssetDescriptor {
      * @returns {String}
      */
     toString() {
-        if (this.isNative) return nativeAssetCode
+        if (this.isNative)
+            return nativeAssetCode
         return `${this.code}-${this.issuer}`
     }
 
@@ -87,7 +88,8 @@ export class AssetDescriptor {
      * @returns {String}
      */
     toFQAN() {
-        if (this.isNative) return nativeAssetCode
+        if (this.isNative)
+            return nativeAssetCode
         return `${this.code}-${this.issuer}-${this.type}`
     }
 
@@ -97,7 +99,8 @@ export class AssetDescriptor {
      * @returns {String}
      */
     toCurrency(issuerMaxLength) {
-        if (this.isNative) return 'XLM'
+        if (this.isNative)
+            return 'XLM'
         if (issuerMaxLength) {
             let issuerAllowedLength = issuerMaxLength - 1,
                 shortenedIssuer = trim(this.issuer, issuerAllowedLength)
@@ -192,8 +195,10 @@ export class LiquidityPoolDescriptor extends AssetDescriptor {
     /**
      * @inheritDoc
      */
-    toCurrency(maxLength) {
-        if (maxLength)
+    toCurrency(maxLength = 8) {
+        if (this.code)
+            return this.code
+        if (maxLength < 56)
             return trim(this.poolId, maxLength)
         return this.poolId
     }
@@ -244,9 +249,11 @@ export class ContractAssetDescriptor extends AssetDescriptor {
     /**
      * @inheritDoc
      */
-    toCurrency(maxLength) {
-        if (maxLength)
-            return trim(this.contract, maxLength)
+    toCurrency(maxLength = 8) {
+        if (this.code)
+            return this.code
+        if (maxLength < 56)
+            return trim(this.poolId, maxLength)
         return this.contract
     }
 
