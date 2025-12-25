@@ -158,7 +158,9 @@ export class AssetDescriptor {
 export class LiquidityPoolDescriptor extends AssetDescriptor {
     constructor(id) {
         super()
-        this.poolId = id
+        this.poolId = id.startsWith('L') ?
+            id :
+            StrKey.encodeLiquidityPool(Buffer.from(id, 'hex'))
         this.poolType = 0
         this.type = 3
         Object.freeze(this)

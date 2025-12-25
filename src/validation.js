@@ -1,3 +1,5 @@
+import {StrKey} from '@stellar/stellar-base'
+
 /**
  * Asset code validation
  * @param {String} code
@@ -14,7 +16,7 @@ export function isValidAssetCode(code) {
  */
 export function isValidPoolId(poolId) {
     if (typeof poolId === 'string')
-        return /^\w{64}$/.test(poolId)
+        return /^\w{64}$/.test(poolId) || StrKey.isValidLiquidityPool(poolId)
     if (poolId instanceof Uint8Array)
         return poolId.length === 32
     return false
