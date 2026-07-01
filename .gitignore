@@ -1,4 +1,4 @@
-node_modules/
-.npm
-
 .idea
+node_modules/
+lib/
+pnpm-lock.yaml
