@@ -1,34 +1,36 @@
 {
   "name": "@stellar-expert/asset-descriptor",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Asset wrapper for Stellar assets",
   "main": "lib/asset-descriptor.js",
   "module": "src/index.js",
-  "sideEffects": false,
-  "exports": {
-    "import": "./src/index.js",
-    "require": "./lib/asset-descriptor.js"
-  },
-  "scripts": {
-    "build": "webpack --mode=production --config webpack.config.cjs"
-  },
+  "types": "src/index.d.ts",
+  "author": "orbitlens<orbit@stellar.expert>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stellar-expert/asset-descriptor.git"
   },
-  "author": "orbitlens<orbit@stellar.expert>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/stellar-expert/asset-descriptor/issues"
+  "bugs": "https://github.com/stellar-expert/asset-descriptor/issues",
+  "sideEffects": false,
+  "exports": {
+    "types": "./src/index.d.ts",
+    "import": "./src/index.js",
+    "require": "./lib/asset-descriptor.js"
+  },
+  "scripts": {
+    "prepare": "rollup -c"
   },
   "peerDependencies": {
-    "@stellar/stellar-base": "*"
+    "@stellar/stellar-sdk": "*"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
-    "babel-loader": "^9.2.1",
-    "webpack": "^5.104.1",
-    "webpack-cli": "^5.1.4"
-  }
+    "@rollup/plugin-terser": "1.0.0",
+    "rollup": "4.62.2"
+  },
+  "files": [
+    "src/",
+    "lib/",
+    "!src/bundle.js"
+  ]
 }

@@ -1,5 +1,4 @@
-import {AssetDescriptor, ContractAssetDescriptor, LiquidityPoolDescriptor, isAssetValid} from './asset-descriptor'
-import {generateLiquidityPoolId, getLiquidityPoolAsset} from './liquidity-pool-id'
+import {AssetDescriptor, ContractAssetDescriptor, LiquidityPoolDescriptor, isAssetValid, generateLiquidityPoolId, getLiquidityPoolAsset} from './asset-descriptor'
 import {isValidAssetCode, isValidContract, isValidPoolId} from './validation'
 import {parseAssetFromObject} from './parser'
 
